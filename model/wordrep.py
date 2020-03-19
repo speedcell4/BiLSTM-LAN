@@ -1,10 +1,12 @@
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
+
+import numpy as np
 import torch
 import torch.nn as nn
-import numpy as np
-from .charbilstm import CharBiLSTM
+
 from .charbigru import CharBiGRU
+from .charbilstm import CharBiLSTM
 from .charcnn import CharCNN
 
 

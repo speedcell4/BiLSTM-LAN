@@ -9,6 +9,7 @@
 Alphabet maps objects to integer ids. It provides two way mapping from the index to the objects.
 """
 from __future__ import print_function
+
 import json
 import os
 import sys
@@ -108,7 +109,7 @@ class Alphabet:
         try:
             json.dump(self.get_content(), open(os.path.join(output_directory, saving_name + ".json"), 'w'))
         except Exception as e:
-            print("Exception: Alphabet is not saved: " % repr(e))
+            print(f"Exception: Alphabet is not saved: ")
 
     def load(self, input_directory, name=None):
         """

@@ -5,21 +5,22 @@
 # @Last Modified time: 2018-09-05 23:05:37
 
 from __future__ import print_function
-import time
-import sys
+
 import argparse
-import random
-import copy
-import torch
 import gc
+import random
+import sys
+import time
+
+import numpy as np
+import torch
 import torch.autograd as autograd
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-import numpy as np
-from utils.metric import get_ner_fmeasure
+
 from model.seqmodel import SeqModel
 from utils.data import Data
+from utils.metric import get_ner_fmeasure
 
 try:
     import cPickle as pickle
@@ -350,7 +351,7 @@ def train(data):
                 temp_cost = temp_time - temp_start
                 temp_start = temp_time
                 print("     Instance: %s; Time: %.2fs; loss: %.4f; acc: %s/%s=%.4f" % (
-                end, temp_cost, sample_loss, right_token, whole_token, (right_token + 0.) / whole_token))
+                    end, temp_cost, sample_loss, right_token, whole_token, (right_token + 0.) / whole_token))
                 sys.stdout.flush()
                 sample_loss = 0
             loss.backward()
@@ -359,11 +360,11 @@ def train(data):
         temp_time = time.time()
         temp_cost = temp_time - temp_start
         print("     Instance: %s; Time: %.2fs; loss: %.4f; acc: %s/%s=%.4f" % (
-        end, temp_cost, sample_loss, right_token, whole_token, (right_token + 0.) / whole_token))
+            end, temp_cost, sample_loss, right_token, whole_token, (right_token + 0.) / whole_token))
         epoch_finish = time.time()
         epoch_cost = epoch_finish - epoch_start
         print("Epoch: %s training finished. Time: %.2fs, speed: %.2fst/s,  total loss: %s" % (
-        idx, epoch_cost, train_num / epoch_cost, total_loss))
+            idx, epoch_cost, train_num / epoch_cost, total_loss))
         # continue
         speed, acc, p, r, f, _, _ = evaluate(data, model, "dev")
         dev_finish = time.time()
@@ -372,7 +373,7 @@ def train(data):
         if data.seg:
             current_score = f
             print("Dev: time: %.2fs, speed: %.2fst/s; acc: %.4f, p: %.4f, r: %.4f, f: %.4f" % (
-            dev_cost, speed, acc, p, r, f))
+                dev_cost, speed, acc, p, r, f))
         else:
             current_score = acc
             print("Dev: time: %.2fs speed: %.2fst/s; acc: %.4f" % (dev_cost, speed, acc))
@@ -392,7 +393,7 @@ def train(data):
         test_cost = test_finish - dev_finish
         if data.seg:
             print("Test: time: %.2fs, speed: %.2fst/s; acc: %.4f, p: %.4f, r: %.4f, f: %.4f" % (
-            test_cost, speed, acc, p, r, f))
+                test_cost, speed, acc, p, r, f))
         else:
             print("Test: time: %.2fs, speed: %.2fst/s; acc: %.4f" % (test_cost, speed, acc))
         gc.collect()
@@ -418,7 +419,7 @@ def load_model_decode(data, name):
     time_cost = end_time - start_time
     if data.seg:
         print("%s: time:%.2fs, speed:%.2fst/s; acc: %.4f, p: %.4f, r: %.4f, f: %.4f" % (
-        name, time_cost, speed, acc, p, r, f))
+            name, time_cost, speed, acc, p, r, f))
     else:
         print("%s: time:%.2fs, speed:%.2fst/s; acc: %.4f" % (name, time_cost, speed, acc))
     return pred_results, pred_scores
@@ -483,6 +484,3 @@ if __name__ == '__main__':
             data.write_decoded_results(decode_results, 'raw')
     else:
         print("Invalid argument! Please use valid arguments! (train/test/decode)")
-
-
-

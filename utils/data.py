@@ -3,9 +3,9 @@
 # @Date:   2017-06-14 17:34:32
 # @Last Modified by:   Jie Yang,     Contact: jieynlp@gmail.com
 # @Last Modified time: 2018-06-22 00:01:47
-from __future__ import print_function
 from __future__ import absolute_import
-import sys
+from __future__ import print_function
+
 from .alphabet import Alphabet
 from .functions import *
 
@@ -14,10 +14,10 @@ try:
 except ImportError:
     import pickle as pickle
 
-
 START = "</s>"
 UNKNOWN = "</unk>"
 PADDING = "</pad>"
+
 
 class Data:
     def __init__(self):
@@ -34,22 +34,21 @@ class Data:
         self.feature_num = len(self.feature_alphabets)
         self.feat_config = None
 
-
-        self.label_alphabet = Alphabet('label',True)
-        self.tagScheme = "NoSeg" ## BMES/BIO
+        self.label_alphabet = Alphabet('label', True)
+        self.tagScheme = "NoSeg"  # BMES/BIO
 
         self.seg = True
 
-        ### I/O
+        # # I/O
         self.train_dir = None
         self.dev_dir = None
         self.test_dir = None
         self.raw_dir = None
 
         self.decode_dir = None
-        self.dset_dir = None ## data vocabulary related file
-        self.model_dir = None ## model save  file
-        self.load_model_dir = None ## model load file
+        self.dset_dir = None  # data vocabulary related file
+        self.model_dir = None  # model save  file
+        self.load_model_dir = None  # model load file
 
         self.word_emb_dir = None
         self.char_emb_dir = None
@@ -79,18 +78,18 @@ class Data:
         self.word_emb_dim = 50
         self.char_emb_dim = 30
 
-        ###Networks
-        self.word_feature_extractor = "LSTM" ## "LSTM"/"CNN"/"GRU"/
+        # #Networks
+        self.word_feature_extractor = "LSTM"  # "LSTM"/"CNN"/"GRU"/
         self.use_char = True
-        self.char_feature_extractor = "CNN" ## "LSTM"/"CNN"/"GRU"/None
+        self.char_feature_extractor = "CNN"  # "LSTM"/"CNN"/"GRU"/None
         self.use_crf = True
         self.nbest = None
 
-        ## Training
+        #  Training
         self.average_batch_loss = False
-        self.optimizer = "SGD" ## "SGD"/"AdaGrad"/"AdaDelta"/"RMSProp"/"Adam"
+        self.optimizer = "SGD"  # "SGD"/"AdaGrad"/"AdaDelta"/"RMSProp"/"Adam"
         self.status = "train"
-        ### Hyperparameters
+        # # Hyperparameters
         self.HP_cnn_layer = 4
         self.HP_iteration = 100
         self.HP_batch_size = 10
@@ -108,88 +107,91 @@ class Data:
         self.HP_l2 = 1e-8
 
     def show_data_summary(self):
-        print("++"*50)
+        print("++" * 50)
         print("DATA SUMMARY START:")
         print(" I/O:")
-        print("     Tag          scheme: %s"%(self.tagScheme))
-        print("     MAX SENTENCE LENGTH: %s"%(self.MAX_SENTENCE_LENGTH))
-        print("     MAX   WORD   LENGTH: %s"%(self.MAX_WORD_LENGTH))
-        print("     Number   normalized: %s"%(self.number_normalized))
-        print("     Word  alphabet size: %s"%(self.word_alphabet_size))
-        print("     Char  alphabet size: %s"%(self.char_alphabet_size))
-        print("     Label alphabet size: %s"%(self.label_alphabet_size))
-        print("     Word embedding  dir: %s"%(self.word_emb_dir))
-        print("     Char embedding  dir: %s"%(self.char_emb_dir))
-        print("     Word embedding size: %s"%(self.word_emb_dim))
-        print("     Char embedding size: %s"%(self.char_emb_dim))
-        print("     Norm   word     emb: %s"%(self.norm_word_emb))
-        print("     Norm   char     emb: %s"%(self.norm_char_emb))
-        print("     Train  file directory: %s"%(self.train_dir))
-        print("     Dev    file directory: %s"%(self.dev_dir))
-        print("     Test   file directory: %s"%(self.test_dir))
-        print("     Raw    file directory: %s"%(self.raw_dir))
-        print("     Dset   file directory: %s"%(self.dset_dir))
-        print("     Model  file directory: %s"%(self.model_dir))
-        print("     Loadmodel   directory: %s"%(self.load_model_dir))
-        print("     Decode file directory: %s"%(self.decode_dir))
-        print("     Train instance number: %s"%(len(self.train_texts)))
-        print("     Dev   instance number: %s"%(len(self.dev_texts)))
-        print("     Test  instance number: %s"%(len(self.test_texts)))
-        print("     Raw   instance number: %s"%(len(self.raw_texts)))
-        print("     FEATURE num: %s"%(self.feature_num))
+        print(f"     Tag          scheme: {self.tagScheme}")
+        print(f"     MAX SENTENCE LENGTH: {self.MAX_SENTENCE_LENGTH}")
+        print(f"     MAX   WORD   LENGTH: {self.MAX_WORD_LENGTH}")
+        print(f"     Number   normalized: {self.number_normalized}")
+        print(f"     Word  alphabet size: {self.word_alphabet_size}")
+        print(f"     Char  alphabet size: {self.char_alphabet_size}")
+        print(f"     Label alphabet size: {self.label_alphabet_size}")
+        print(f"     Word embedding  dir: {self.word_emb_dir}")
+        print(f"     Char embedding  dir: {self.char_emb_dir}")
+        print(f"     Word embedding size: {self.word_emb_dim}")
+        print(f"     Char embedding size: {self.char_emb_dim}")
+        print(f"     Norm   word     emb: {self.norm_word_emb}")
+        print(f"     Norm   char     emb: {self.norm_char_emb}")
+        print(f"     Train  file directory: {self.train_dir}")
+        print(f"     Dev    file directory: {self.dev_dir}")
+        print(f"     Test   file directory: {self.test_dir}")
+        print(f"     Raw    file directory: {self.raw_dir}")
+        print(f"     Dset   file directory: {self.dset_dir}")
+        print(f"     Model  file directory: {self.model_dir}")
+        print(f"     Loadmodel   directory: {self.load_model_dir}")
+        print(f"     Decode file directory: {self.decode_dir}")
+        print(f"     Train instance number: {len(self.train_texts)}")
+        print(f"     Dev   instance number: {len(self.dev_texts)}")
+        print(f"     Test  instance number: {len(self.test_texts)}")
+        print(f"     Raw   instance number: {len(self.raw_texts)}")
+        print(f"     FEATURE num: {self.feature_num}")
         for idx in range(self.feature_num):
-            print("         Fe: %s  alphabet  size: %s"%(self.feature_alphabets[idx].name, self.feature_alphabet_sizes[idx]))
-            print("         Fe: %s  embedding  dir: %s"%(self.feature_alphabets[idx].name, self.feature_emb_dirs[idx]))
-            print("         Fe: %s  embedding size: %s"%(self.feature_alphabets[idx].name, self.feature_emb_dims[idx]))
-            print("         Fe: %s  norm       emb: %s"%(self.feature_alphabets[idx].name, self.norm_feature_embs[idx]))
-        print(" "+"++"*20)
+            print(
+                f"         Fe: {self.feature_alphabets[idx].name}  alphabet  size: {self.feature_alphabet_sizes[idx]}")
+            print(
+                f"         Fe: {self.feature_alphabets[idx].name}  embedding  dir: {self.feature_emb_dirs[idx]}")
+            print(
+                f"         Fe: {self.feature_alphabets[idx].name}  embedding size: {self.feature_emb_dims[idx]}")
+            print(
+                f"         Fe: {self.feature_alphabets[idx].name}  norm       emb: {self.norm_feature_embs[idx]}")
+        print(" " + "++" * 20)
         print(" Model Network:")
-        print("     Model        use_crf: %s"%(self.use_crf))
-        print("     Model word extractor: %s"%(self.word_feature_extractor))
-        print("     Model       use_char: %s"%(self.use_char))
+        print(f"     Model        use_crf: {self.use_crf}")
+        print(f"     Model word extractor: {self.word_feature_extractor}")
+        print(f"     Model       use_char: {self.use_char}")
         if self.use_char:
-            print("     Model char extractor: %s"%(self.char_feature_extractor))
-            print("     Model char_hidden_dim: %s"%(self.HP_char_hidden_dim))
-        print(" "+"++"*20)
+            print(f"     Model char extractor: {self.char_feature_extractor}")
+            print(f"     Model char_hidden_dim: {self.HP_char_hidden_dim}")
+        print(" " + "++" * 20)
         print(" Training:")
-        print("     Optimizer: %s"%(self.optimizer))
-        print("     Iteration: %s"%(self.HP_iteration))
-        print("     BatchSize: %s"%(self.HP_batch_size))
-        print("     Average  batch   loss: %s"%(self.average_batch_loss))
+        print(f"     Optimizer: {self.optimizer}")
+        print(f"     Iteration: {self.HP_iteration}")
+        print(f"     BatchSize: {self.HP_batch_size}")
+        print(f"     Average  batch   loss: {self.average_batch_loss}")
 
-        print(" "+"++"*20)
+        print(" " + "++" * 20)
         print(" Hyperparameters:")
 
-        print("     Hyper              lr: %s"%(self.HP_lr))
-        print("     Hyper        lr_decay: %s"%(self.HP_lr_decay))
-        print("     Hyper         HP_clip: %s"%(self.HP_clip))
-        print("     Hyper        momentum: %s"%(self.HP_momentum))
-        print("     Hyper              l2: %s"%(self.HP_l2))
-        print("     Hyper      hidden_dim: %s"%(self.HP_hidden_dim))
-        print("     Hyper         dropout: %s"%(self.HP_dropout))
-        print("     Hyper      lstm_layer: %s"%(self.HP_lstm_layer))
-        print("     Hyper          bilstm: %s"%(self.HP_bilstm))
-        print("     Hyper             GPU: %s"%(self.HP_gpu))
+        print(f"     Hyper              lr: {self.HP_lr}")
+        print(f"     Hyper        lr_decay: {self.HP_lr_decay}")
+        print(f"     Hyper         HP_clip: {self.HP_clip}")
+        print(f"     Hyper        momentum: {self.HP_momentum}")
+        print(f"     Hyper              l2: {self.HP_l2}")
+        print(f"     Hyper      hidden_dim: {self.HP_hidden_dim}")
+        print(f"     Hyper         dropout: {self.HP_dropout}")
+        print(f"     Hyper      lstm_layer: {self.HP_lstm_layer}")
+        print(f"     Hyper          bilstm: {self.HP_bilstm}")
+        print(f"     Hyper             GPU: {self.HP_gpu}")
         print("DATA SUMMARY END.")
-        print("++"*50)
+        print("++" * 50)
         sys.stdout.flush()
 
-
     def initial_feature_alphabets(self):
-        items = open(self.train_dir,'r').readline().strip('\n').split()
+        items = open(self.train_dir, 'r').readline().strip('\n').split()
         total_column = len(items)
         if total_column > 2:
-            for idx in range(1, total_column-1):
-                feature_prefix = items[idx].split(']',1)[0]+"]"
+            for idx in range(1, total_column - 1):
+                feature_prefix = items[idx].split(']', 1)[0] + "]"
                 self.feature_alphabets.append(Alphabet(feature_prefix))
                 self.feature_name.append(feature_prefix)
                 print("Find feature: ", feature_prefix)
         self.feature_num = len(self.feature_alphabets)
-        self.pretrain_feature_embeddings = [None]*self.feature_num
-        self.feature_emb_dims = [20]*self.feature_num
-        self.feature_emb_dirs = [None]*self.feature_num
-        self.norm_feature_embs = [False]*self.feature_num
-        self.feature_alphabet_sizes = [0]*self.feature_num
+        self.pretrain_feature_embeddings = [None] * self.feature_num
+        self.feature_emb_dims = [20] * self.feature_num
+        self.feature_emb_dirs = [None] * self.feature_num
+        self.norm_feature_embs = [False] * self.feature_num
+        self.feature_alphabet_sizes = [0] * self.feature_num
         if self.feat_config:
             for idx in range(self.feature_num):
                 if self.feature_name[idx] in self.feat_config:
@@ -198,9 +200,8 @@ class Data:
                     self.norm_feature_embs[idx] = self.feat_config[self.feature_name[idx]]['emb_norm']
         # exit(0)
 
-
     def build_alphabet(self, input_file):
-        in_lines = open(input_file,'r').readlines()
+        in_lines = open(input_file, 'r').readlines()
         for line in in_lines:
             if len(line) > 2:
                 pairs = line.strip().split()
@@ -212,9 +213,9 @@ class Data:
                 label = pairs[-1]
                 self.label_alphabet.add(label)
                 self.word_alphabet.add(word)
-                ## build feature alphabet
+                #  build feature alphabet
                 for idx in range(self.feature_num):
-                    feat_idx = pairs[idx+1].split(']',1)[-1]
+                    feat_idx = pairs[idx + 1].split(']', 1)[-1]
                     self.feature_alphabets[idx].add(feat_idx)
                 for char in word:
                     self.char_alphabet.add(char)
@@ -225,7 +226,7 @@ class Data:
             self.feature_alphabet_sizes[idx] = self.feature_alphabets[idx].size()
         startS = False
         startB = False
-        for label,_ in self.label_alphabet.iteritems():
+        for label, _ in self.label_alphabet.iteritems():
             if "S-" in label.upper():
                 startS = True
             elif "B-" in label.upper():
@@ -236,7 +237,6 @@ class Data:
             else:
                 self.tagScheme = "BIO"
 
-
     def fix_alphabet(self):
         self.word_alphabet.close()
         self.char_alphabet.close()
@@ -244,40 +244,54 @@ class Data:
         for idx in range(self.feature_num):
             self.feature_alphabets[idx].close()
 
-
     def build_pretrain_emb(self):
         if self.word_emb_dir:
-            print("Load pretrained word embedding, norm: %s, dir: %s"%(self.norm_word_emb, self.word_emb_dir))
-            self.pretrain_word_embedding, self.word_emb_dim = build_pretrain_embedding(self.word_emb_dir, self.word_alphabet, self.word_emb_dim, self.norm_word_emb)
+            print(f"Load pretrained word embedding, norm: {self.norm_word_emb}, dir: {self.word_emb_dir}")
+            self.pretrain_word_embedding, self.word_emb_dim = build_pretrain_embedding(self.word_emb_dir,
+                                                                                       self.word_alphabet,
+                                                                                       self.word_emb_dim,
+                                                                                       self.norm_word_emb)
         if self.char_emb_dir:
-            print("Load pretrained char embedding, norm: %s, dir: %s"%(self.norm_char_emb, self.char_emb_dir))
-            self.pretrain_char_embedding, self.char_emb_dim = build_pretrain_embedding(self.char_emb_dir, self.char_alphabet, self.char_emb_dim, self.norm_char_emb)
+            print(f"Load pretrained char embedding, norm: {self.norm_char_emb}, dir: {self.char_emb_dir}")
+            self.pretrain_char_embedding, self.char_emb_dim = build_pretrain_embedding(self.char_emb_dir,
+                                                                                       self.char_alphabet,
+                                                                                       self.char_emb_dim,
+                                                                                       self.norm_char_emb)
         for idx in range(self.feature_num):
             if self.feature_emb_dirs[idx]:
-                print("Load pretrained feature %s embedding:, norm: %s, dir: %s"%(self.feature_name[idx], self.norm_feature_embs[idx], self.feature_emb_dirs[idx]))
-                self.pretrain_feature_embeddings[idx], self.feature_emb_dims[idx] = build_pretrain_embedding(self.feature_emb_dirs[idx], self.feature_alphabets[idx], self.feature_emb_dims[idx], self.norm_feature_embs[idx])
-
+                print(f"Load pretrained feature {self.feature_name[idx]} embedding:, "
+                      f"norm: {self.norm_feature_embs[idx]}, dir: {self.feature_emb_dirs[idx]}")
+                self.pretrain_feature_embeddings[idx], self.feature_emb_dims[idx] = build_pretrain_embedding(
+                    self.feature_emb_dirs[idx], self.feature_alphabets[idx], self.feature_emb_dims[idx],
+                    self.norm_feature_embs[idx])
 
     def generate_instance(self, name):
         self.fix_alphabet()
         if name == "train":
-            self.train_texts, self.train_Ids = read_instance(self.train_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH)
+            self.train_texts, self.train_Ids = read_instance(self.train_dir, self.word_alphabet, self.char_alphabet,
+                                                             self.feature_alphabets, self.label_alphabet,
+                                                             self.number_normalized, self.MAX_SENTENCE_LENGTH)
         elif name == "dev":
-            self.dev_texts, self.dev_Ids = read_instance(self.dev_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH)
+            self.dev_texts, self.dev_Ids = read_instance(self.dev_dir, self.word_alphabet, self.char_alphabet,
+                                                         self.feature_alphabets, self.label_alphabet,
+                                                         self.number_normalized, self.MAX_SENTENCE_LENGTH)
         elif name == "test":
-            self.test_texts, self.test_Ids = read_instance(self.test_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH)
+            self.test_texts, self.test_Ids = read_instance(self.test_dir, self.word_alphabet, self.char_alphabet,
+                                                           self.feature_alphabets, self.label_alphabet,
+                                                           self.number_normalized, self.MAX_SENTENCE_LENGTH)
         elif name == "raw":
-            self.raw_texts, self.raw_Ids = read_instance(self.raw_dir, self.word_alphabet, self.char_alphabet, self.feature_alphabets, self.label_alphabet, self.number_normalized, self.MAX_SENTENCE_LENGTH)
+            self.raw_texts, self.raw_Ids = read_instance(self.raw_dir, self.word_alphabet, self.char_alphabet,
+                                                         self.feature_alphabets, self.label_alphabet,
+                                                         self.number_normalized, self.MAX_SENTENCE_LENGTH)
         else:
-            print("Error: you can only generate train/dev/test instance! Illegal input:%s"%(name))
-
+            print(f"Error: you can only generate train/dev/test instance! Illegal input:{name}")
 
     def write_decoded_results(self, predict_results, name):
-        fout = open(self.decode_dir,'w')
+        fout = open(self.decode_dir, 'w')
         sent_num = len(predict_results)
         content_list = []
         if name == 'raw':
-           content_list = self.raw_texts
+            content_list = self.raw_texts
         elif name == 'test':
             content_list = self.test_texts
         elif name == 'dev':
@@ -286,38 +300,35 @@ class Data:
             content_list = self.train_texts
         else:
             print("Error: illegal name during writing predict result, name should be within train/dev/test/raw !")
-        assert(sent_num == len(content_list))
+        assert (sent_num == len(content_list))
         for idx in range(sent_num):
             sent_length = len(predict_results[idx])
             for idy in range(sent_length):
-                ## content_list[idx] is a list with [word, char, label]
+                #  content_list[idx] is a list with [word, char, label]
                 fout.write(content_list[idx][0][idy].encode('utf-8') + " " + predict_results[idx][idy] + '\n')
             fout.write('\n')
         fout.close()
-        print("Predict %s result has been written into file. %s"%(name, self.decode_dir))
+        print(f"Predict {name} result has been written into file. {self.decode_dir}")
 
-
-    def load(self,data_file):
+    def load(self, data_file):
         f = open(data_file, 'rb')
         tmp_dict = pickle.load(f)
         f.close()
         self.__dict__.update(tmp_dict)
 
-    def save(self,save_file):
+    def save(self, save_file):
         f = open(save_file, 'wb')
         pickle.dump(self.__dict__, f, 2)
         f.close()
 
-
-
     def write_nbest_decoded_results(self, predict_results, pred_scores, name):
-        ## predict_results : [whole_sent_num, nbest, each_sent_length]
-        ## pred_scores: [whole_sent_num, nbest]
-        fout = open(self.decode_dir,'w')
+        #  predict_results : [whole_sent_num, nbest, each_sent_length]
+        #  pred_scores: [whole_sent_num, nbest]
+        fout = open(self.decode_dir, 'w')
         sent_num = len(predict_results)
         content_list = []
         if name == 'raw':
-           content_list = self.raw_texts
+            content_list = self.raw_texts
         elif name == 'test':
             content_list = self.test_texts
         elif name == 'dev':
@@ -326,14 +337,14 @@ class Data:
             content_list = self.train_texts
         else:
             print("Error: illegal name during writing predict result, name should be within train/dev/test/raw !")
-        assert(sent_num == len(content_list))
-        assert(sent_num == len(pred_scores))
+        assert (sent_num == len(content_list))
+        assert (sent_num == len(pred_scores))
         for idx in range(sent_num):
             sent_length = len(predict_results[idx][0])
             nbest = len(predict_results[idx])
             score_string = "# "
             for idz in range(nbest):
-                score_string += format(pred_scores[idx][idz], '.4f')+" "
+                score_string += format(pred_scores[idx][idz], '.4f') + " "
             fout.write(score_string.strip() + "\n")
 
             for idy in range(sent_length):
@@ -342,18 +353,16 @@ class Data:
                 except:
                     label_string = content_list[idx][0][idy] + " "
                 for idz in range(nbest):
-                    label_string += predict_results[idx][idz][idy]+" "
+                    label_string += predict_results[idx][idz][idy] + " "
                 label_string = label_string.strip() + "\n"
                 fout.write(label_string)
             fout.write('\n')
         fout.close()
-        print("Predict %s %s-best result has been written into file. %s"%(name,nbest, self.decode_dir))
+        print(f"Predict {name} {nbest}-best result has been written into file. {self.decode_dir}")
 
+    def read_config(self, args):
 
-    def read_config(self,args):
-
-        ## read data:
-
+        #  read data:
 
         self.train_dir = args.train_dir
 
@@ -385,7 +394,7 @@ class Data:
 
         self.char_feature_extractor = args.char_seq_feature
 
-        ## read training setting:
+        #  read training setting:
 
         self.optimizer = args.optimizer
 
@@ -427,47 +436,47 @@ class Data:
 
         self.whether_clip_grad = str2bool(args.whether_clip_grad)
 
-        ##
+        #
         # self.MAX_SENTENCE_LENGTH = int(args.MAX_SENTENCE_LENGTH)
         #
         # self.MAX_WORD_LENGTH = int(args.MAX_WORD_LENGTH )
 
 
-
 def config_file_to_dict(input_file):
     config = {}
-    fins = open(input_file,'r').readlines()
+    fins = open(input_file, 'r').readlines()
     for line in fins:
         if len(line) > 0 and line[0] == "#":
             continue
         if "=" in line:
-            pair = line.strip().split('#',1)[0].split('=',1)
+            pair = line.strip().split('#', 1)[0].split('=', 1)
             item = pair[0]
-            if item=="feature":
+            if item == "feature":
                 if item not in config:
                     feat_dict = {}
-                    config[item]= feat_dict
+                    config[item] = feat_dict
                 feat_dict = config[item]
                 new_pair = pair[-1].split()
                 feat_name = new_pair[0]
-                one_dict = {}
-                one_dict["emb_dir"] = None
-                one_dict["emb_size"] = 10
-                one_dict["emb_norm"] = False
+                one_dict = {
+                    "emb_dir": None,
+                    "emb_size": 10,
+                    "emb_norm": False,
+                }
                 if len(new_pair) > 1:
-                    for idx in range(1,len(new_pair)):
+                    for idx in range(1, len(new_pair)):
                         conf_pair = new_pair[idx].split('=')
                         if conf_pair[0] == "emb_dir":
-                            one_dict["emb_dir"]=conf_pair[-1]
+                            one_dict["emb_dir"] = conf_pair[-1]
                         elif conf_pair[0] == "emb_size":
-                            one_dict["emb_size"]=int(conf_pair[-1])
+                            one_dict["emb_size"] = int(conf_pair[-1])
                         elif conf_pair[0] == "emb_norm":
-                            one_dict["emb_norm"]=str2bool(conf_pair[-1])
+                            one_dict["emb_norm"] = str2bool(conf_pair[-1])
                 feat_dict[feat_name] = one_dict
                 # print "feat",feat_dict
             else:
                 if item in config:
-                    print("Warning: duplicated config item found: %s, updated."%(pair[0]))
+                    print(f"Warning: duplicated config item found: {pair[0]}, updated.")
                 config[item] = pair[-1]
     return config
 

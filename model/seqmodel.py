@@ -1,10 +1,13 @@
-from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import print_function
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .wordsequence import WordSequence
+
 from .crf import CRF
+from .wordsequence import WordSequence
+
 
 class SeqModel(nn.Module):
     def __init__(self, data):
@@ -24,8 +27,10 @@ class SeqModel(nn.Module):
         if self.use_crf:
             self.crf = CRF(label_size, self.gpu)
 
-    def neg_log_likelihood_loss(self, word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover, batch_label, mask,input_label_seq_tensor):
-        outs = self.word_hidden(word_inputs,feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover,input_label_seq_tensor)
+    def neg_log_likelihood_loss(self, word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths,
+                                char_seq_recover, batch_label, mask, input_label_seq_tensor):
+        outs = self.word_hidden(word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths,
+                                char_seq_recover, input_label_seq_tensor)
         batch_size = word_inputs.size(0)
         seq_len = word_inputs.size(1)
         if self.use_crf:
@@ -36,20 +41,21 @@ class SeqModel(nn.Module):
             outs = outs.view(batch_size * seq_len, -1)
             score = F.log_softmax(outs, 1)
             total_loss = loss_function(score, batch_label.view(batch_size * seq_len))
-            _, tag_seq  = torch.max(score, 1)
+            _, tag_seq = torch.max(score, 1)
             tag_seq = tag_seq.view(batch_size, seq_len)
         if self.average_batch:
             total_loss = total_loss / batch_size
         return total_loss, tag_seq
 
-
-    def forward(self, word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover, mask,input_label_seq_tensor):
-        outs = self.word_hidden(word_inputs,feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover,input_label_seq_tensor)
+    def forward(self, word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover,
+                mask, input_label_seq_tensor):
+        outs = self.word_hidden(word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths,
+                                char_seq_recover, input_label_seq_tensor)
         batch_size = word_inputs.size(0)
         seq_len = word_inputs.size(1)
 
         outs = outs.view(batch_size * seq_len, -1)
-        _, tag_seq  = torch.max(outs, 1)
+        _, tag_seq = torch.max(outs, 1)
         tag_seq = tag_seq.view(batch_size, seq_len)
         ## filter padded position with zero
         tag_seq = mask.long() * tag_seq

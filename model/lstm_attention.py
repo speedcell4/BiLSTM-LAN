@@ -1,27 +1,28 @@
 from __future__ import print_function
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import *
+from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
 
 class LSTM_attention(nn.Module):
     ''' Compose with two layers '''
-    def __init__(self,lstm_hidden,bilstm_flag,data):
+
+    def __init__(self, lstm_hidden, bilstm_flag, data):
         super(LSTM_attention, self).__init__()
 
         self.lstm = nn.LSTM(lstm_hidden * 4, lstm_hidden, num_layers=1, batch_first=True, bidirectional=bilstm_flag)
-        #self.slf_attn = multihead_attention(data.HP_hidden_dim,num_heads = data.num_attention_head, dropout_rate=data.HP_dropout)
-        self.label_attn = multihead_attention(data.HP_hidden_dim, num_heads=data.num_attention_head,dropout_rate=data.HP_dropout)
+        # self.slf_attn = multihead_attention(data.HP_hidden_dim,num_heads = data.num_attention_head, dropout_rate=data.HP_dropout)
+        self.label_attn = multihead_attention(data.HP_hidden_dim, num_heads=data.num_attention_head,
+                                              dropout_rate=data.HP_dropout)
         self.droplstm = nn.Dropout(data.HP_dropout)
         self.gpu = data.HP_gpu
         if self.gpu:
-            self.lstm =self.lstm.cuda()
+            self.lstm = self.lstm.cuda()
             self.label_attn = self.label_attn.cuda()
 
-
-    def forward(self,lstm_out,label_embs,word_seq_lengths,hidden):
+    def forward(self, lstm_out, label_embs, word_seq_lengths, hidden):
         lstm_out = pack_padded_sequence(input=lstm_out, lengths=word_seq_lengths.cpu().numpy(), batch_first=True)
         lstm_out, hidden = self.lstm(lstm_out, hidden)
         lstm_out, _ = pad_packed_sequence(lstm_out)
@@ -31,6 +32,7 @@ class LSTM_attention(nn.Module):
         # label_attention_output (batch_size, seq_len, embed_size)
         lstm_out = torch.cat([lstm_out, label_attention_output], -1)
         return lstm_out
+
 
 class multihead_attention(nn.Module):
 
@@ -56,10 +58,9 @@ class multihead_attention(nn.Module):
             self.K_proj = self.K_proj.cuda()
             self.V_proj = self.V_proj.cuda()
 
-
         self.output_dropout = nn.Dropout(p=self.dropout_rate)
 
-    def forward(self, queries, keys, values,last_layer = False):
+    def forward(self, queries, keys, values, last_layer=False):
         # keys, values: same shape of [N, T_k, C_k]
         # queries: A 3d Variable with shape of [N, T_q, C_q]
         # Linear projections

@@ -1,14 +1,15 @@
-import torch.nn as nn
 import torch
+import torch.nn as nn
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-from .wordrep import WordRep
+
 from model.lstm_attention import LSTM_attention, multihead_attention
+from .wordrep import WordRep
 
 
 class WordSequence(nn.Module):
     def __init__(self, data):
         super(WordSequence, self).__init__()
-        print("build word sequence feature extractor: %s..."%(data.word_feature_extractor))
+        print("build word sequence feature extractor: %s..." % (data.word_feature_extractor))
         self.gpu = data.HP_gpu
         self.use_char = data.use_char
         # self.batch_size = data.HP_batch_size
@@ -16,7 +17,7 @@ class WordSequence(nn.Module):
         self.droplstm = nn.Dropout(data.HP_dropout)
         self.bilstm_flag = data.HP_bilstm
         self.num_of_lstm_layer = data.HP_lstm_layer
-        #word embedding
+        # word embedding
         self.wordrep = WordRep(data)
 
         self.input_size = data.word_emb_dim
@@ -36,15 +37,17 @@ class WordSequence(nn.Module):
         self.word_feature_extractor = data.word_feature_extractor
 
         self.lstm_first = nn.LSTM(self.input_size, lstm_hidden, num_layers=1, batch_first=True,
-                            bidirectional=self.bilstm_flag)
+                                  bidirectional=self.bilstm_flag)
         self.lstm_layer = nn.LSTM(lstm_hidden * 4, lstm_hidden, num_layers=1, batch_first=True,
                                   bidirectional=self.bilstm_flag)
-        self.self_attention_first = multihead_attention(data.HP_hidden_dim,num_heads=data.num_attention_head, dropout_rate=data.HP_dropout, gpu=self.gpu)
+        self.self_attention_first = multihead_attention(data.HP_hidden_dim, num_heads=data.num_attention_head,
+                                                        dropout_rate=data.HP_dropout, gpu=self.gpu)
         # DO NOT Add dropout at last layer
-        self.self_attention_last = multihead_attention(data.HP_hidden_dim,num_heads=1, dropout_rate=0, gpu=self.gpu)
-        self.lstm_attention_stack =  nn.ModuleList([LSTM_attention(lstm_hidden,self.bilstm_flag,data) for _ in range(int(self.num_of_lstm_layer)-2)])
-        #highway encoding
-        #self.highway_encoding = HighwayEncoding(data,data.HP_hidden_dim,activation_function=F.relu)
+        self.self_attention_last = multihead_attention(data.HP_hidden_dim, num_heads=1, dropout_rate=0, gpu=self.gpu)
+        self.lstm_attention_stack = nn.ModuleList(
+            [LSTM_attention(lstm_hidden, self.bilstm_flag, data) for _ in range(int(self.num_of_lstm_layer) - 2)])
+        # highway encoding
+        # self.highway_encoding = HighwayEncoding(data,data.HP_hidden_dim,activation_function=F.relu)
 
         if self.gpu:
             self.droplstm = self.droplstm.cuda()
@@ -54,8 +57,8 @@ class WordSequence(nn.Module):
             self.self_attention_last = self.self_attention_last.cuda()
             self.lstm_attention_stack = self.lstm_attention_stack.cuda()
 
-
-    def forward(self, word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover, input_label_seq_tensor):
+    def forward(self, word_inputs, feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover,
+                input_label_seq_tensor):
         """
             input:
                 word_inputs: (batch_size, sent_len)
@@ -67,8 +70,9 @@ class WordSequence(nn.Module):
             output:
                 Variable(batch_size, sent_len, hidden_dim)
         """
-        word_represent, label_embs = self.wordrep(word_inputs,feature_inputs, word_seq_lengths, char_inputs, char_seq_lengths, char_seq_recover,input_label_seq_tensor)
-        #word_represent shape [batch_size, seq_length, word_embedding_dim+char_hidden_dim]
+        word_represent, label_embs = self.wordrep(word_inputs, feature_inputs, word_seq_lengths, char_inputs,
+                                                  char_seq_lengths, char_seq_recover, input_label_seq_tensor)
+        # word_represent shape [batch_size, seq_length, word_embedding_dim+char_hidden_dim]
         # word_embs (batch_size, seq_len, embed_size)
         # label_embs = self.highway_encoding(label_embs)
         """
@@ -84,7 +88,7 @@ class WordSequence(nn.Module):
         attention_label = self.self_attention_first(lstm_out, label_embs, label_embs)
         # shape [batch_size, seq_length, embedding_dim]
         lstm_out = torch.cat([lstm_out, attention_label], -1)
-        #shape [batch_size, seq_length, embedding_dim + label_embeeding_dim]
+        # shape [batch_size, seq_length, embedding_dim + label_embeeding_dim]
 
         # LAN layer
         for layer in self.lstm_attention_stack:
@@ -99,4 +103,3 @@ class WordSequence(nn.Module):
         lstm_out = self.droplstm(lstm_out.transpose(1, 0))
         lstm_out = self.self_attention_last(lstm_out, label_embs, label_embs, True)
         return lstm_out
-
